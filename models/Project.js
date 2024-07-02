@@ -6,11 +6,9 @@ const Project = connection.define('projects',{
         type:sequelize.STRING,
         allowNull:false
     }, description:{
-        type:sequelize.STRING,
+        type:sequelize.TEXT,
         allowNull:false
     }
 });
-
-Project.sync({force:true});
 
 module.exports = Project;
