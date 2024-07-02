@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const port = 8080;
 const Project = require('./models/Project');
+const User = require('./models/User');
 const { where } = require('sequelize');
 
 app.use(express.json());
