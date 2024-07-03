@@ -1,5 +1,6 @@
 const sequelize = require('sequelize');
 const connection = require('../db/db');
+const User = require('./User');
 
 const Project = connection.define('projects',{
     title:{
@@ -10,6 +11,8 @@ const Project = connection.define('projects',{
         allowNull:false
     }
 });
+User.hasMany(Project);
+Project.belongsTo(User);
 
 
 module.exports = Project;
