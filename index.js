@@ -1,76 +1,61 @@
 const express = require('express');
 const app = express();
+const bcrypt = require('bcryptjs');
+
 const port = 8080;
+
 const Project = require('./models/Project');
 const User = require('./models/User');
+const Task = require('./models/Task');
+const projectController = require('./projects/projectController');
 const { where } = require('sequelize');
 
 app.use(express.json());
+app.use('/', projectController);
 
-app.get('/', async(req, res)=>{
+app.post('/user', async(req, res)=>{
+    const {name, email, password} = req.body;
     try{
-        const projects = await Project.findAll();      
-        res.json(projects);  
+        const u= await User.findOne({
+            where:{
+                email:email
+            }
+        })
+        if(u==null){
+            const salt = bcrypt.genSaltSync(11);
+            const hash = bcrypt.hashSync(password, salt);
+            await User.create({
+                    name,
+                    email,
+                    password:hash
+            }).
+                res.redirect('/');
+        } else {
+            res.redirect('/user');
+        } 
     } catch(err){
         res.json(err);
     }
 });
 
-app.get('/:id', async(req, res)=>{
-    const id = req.params.id;
-    try{
-
-        const project = await Project.findOne({
-            where:{
-                id:id
-            }
-        });
-        res.json(project);
-    } catch(err){
-        res.json(err);
+app.post('/auth', async(req, res)=>{
+    const {email,password} = req.body;
+    const u = await User.findOne({
+        where:{
+            email:email,
+        }
+    })
+    if(u!=null){
+        const verification = bcrypt.compareSync(password, u.password);
+        if(verification){
+            res.redirect('/');
+        } else {
+            res.json({err:"Senha incorreta"});
+        }
+    } else {
+        res.json({err:"Usuário inexistente!!"});
     }
 })
-
-app.post('/', async(req, res)=>{
-    const {title, description} = req.body;
-    try {
-        Project.create({
-            title,
-            description
-        });
-        res.redirect('/');
-    } catch (err) {
-        res.json({err});
-    }
-});
-app.delete('/:id', async(req, res)=>{
-    const id = req.params.id;
-    try{
-        Project.destroy({
-            where:{
-                id:id
-            }
-        });
-        res.redirect('/');
-    } catch(err){
-        res.json(err);
-    }
-});
-app.put('/:id', async(req, res)=>{
-    const id = req.params.id;
-    const {title, description} = req.body;
-    try{
-        await Project.update({
-            title,
-            description
-        }, {
-            where:{id:id}
-        });
-        res.redirect(`/${id}`);
-    } catch(err){
-        res.json(err);
-    }
-});
 
 app.listen(port,()=>{
     console.log(`Servidor rodando em http://localhost:${port}`);
