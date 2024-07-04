@@ -40,13 +40,20 @@ router.post('/project', authenticator ,async(req, res)=>{
 
 router.delete('/project/:id', authenticator, async(req, res)=>{
     const id = req.params.id;
+    const user = req.loggedUser;
+    const project = await Project.findOne({where:{id:id}});
+
     try{
-        Project.destroy({
-            where:{
-                id:id
-            }
-        });
-        res.redirect('/projects');
+        if(user.id==project.userId){
+            Project.destroy({
+                where:{
+                    id:id
+                }
+            });
+            res.redirect('/projects');
+        } else {
+            res.status(401).json({err:"Usuário não autorizado"});
+        }
     } catch(err){
         res.json(err);
     }
@@ -55,15 +62,21 @@ router.delete('/project/:id', authenticator, async(req, res)=>{
 router.put('/project/:id', authenticator, async(req, res)=>{
     const id = req.params.id;
     const {title, description} = req.body;
+    const user = req.loggedUser;
+    const project = await Project.findOne({where:{id:id}});
     try{
-        await Project.update({
-            title,
-            description
-        }, {
-            where:{id:id}
-        });
-        res.redirect(`/project/${id}`);
-    } catch(err){
+        if(user.id==project.userId){
+            await Project.update({
+                title,
+                description
+            }, {
+                where:{id:id}
+            });
+            res.redirect(`/project/${id}`);
+        } else {
+            res.status(401).json({err:"Usuário não autorizado"});
+        }
+} catch(err){
         res.json(err);
     }
 });
