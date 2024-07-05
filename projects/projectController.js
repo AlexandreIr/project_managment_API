@@ -4,9 +4,7 @@ const Sequelize = require('sequelize');
 const Project = require('../models/Project');
 const authenticator = require('../middlewares/authMid');
 
-router.use(authenticator);
-
-router.get('/projects',async(req, res)=>{
+router.get('/projects',authenticator,async(req, res)=>{
     const user = req.loggedUser;
     try{
         const projects = await Project.findAll({where:{userId:user.id}});      
@@ -15,7 +13,7 @@ router.get('/projects',async(req, res)=>{
         res.json(err);
     }
 });
-router.get('/project/:id', async(req, res)=>{
+router.get('/project/:id',authenticator, async(req, res)=>{
     const id = req.params.id;
     try {
         const project = await Project.findOne({where:{id:id}});
@@ -25,7 +23,7 @@ router.get('/project/:id', async(req, res)=>{
     }
 });
 
-router.post('/project' ,async(req, res)=>{
+router.post('/project',authenticator,async(req, res)=>{
     const {title, description} = req.body;
     const user = req.loggedUser;
     try {
@@ -40,7 +38,7 @@ router.post('/project' ,async(req, res)=>{
     }
 });
 
-router.delete('/project/:id', async(req, res)=>{
+router.delete('/project/:id',authenticator, async(req, res)=>{
     const id = req.params.id;
     const user = req.loggedUser;
     const project = await Project.findOne({where:{id:id}});
@@ -61,7 +59,7 @@ router.delete('/project/:id', async(req, res)=>{
     }
 });
 
-router.put('/project/:id', async(req, res)=>{
+router.put('/project/:id',authenticator, async(req, res)=>{
     const id = req.params.id;
     const {title, description} = req.body;
     const user = req.loggedUser;

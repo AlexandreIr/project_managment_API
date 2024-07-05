@@ -33,7 +33,7 @@ app.post('/user', async(req, res)=>{
                     email,
                     password:hash
             }).
-                res.redirect('/');
+                res.status(401);
         } else {
             res.redirect('/user');
         } 
@@ -48,7 +48,7 @@ app.post('/auth', async(req, res)=>{
     if(user!=null){
         const verification = bcrypt.compareSync(password, user.password);
         if(verification){
-            jwt.sign({id:user.id,email:user.email}, jwtSecret, {expiresIn:'24h'}, (err, token)=>{
+            jwt.sign({id:user.id,email:user.email,name:user.name}, jwtSecret, {expiresIn:'24h'}, (err, token)=>{
                 if(err){
                     res.status(400).json({err:"Erro, tente novamente"});
                 } 

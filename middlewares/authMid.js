@@ -13,7 +13,7 @@ function authMid(req, res, next){
                 res.status(401).json(err);
             } else {
                 req.token = token;
-                req.loggedUser = {id: data.id, email: data.email};
+                req.loggedUser = {id: data.id, email: data.email, name:data.name};
                 next();
             }
         });

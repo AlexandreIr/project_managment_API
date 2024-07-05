@@ -6,6 +6,8 @@ const Task = connection.define('tasks', {
     task:{
         type:sequelize.STRING,
         allowNull:false
+    },done:{
+        type:sequelize.BOOLEAN,
     }
 });
 
