@@ -4,14 +4,17 @@ Esta é uma API CRUD completa para um sistema de gestão de projetos com autenti
 ### POST /user
 Esse endpoint é responsável por verificar a existência de usuários e por criar usuários no banco de dados.
 ### Parâmetros
-Nenhum.
+name: nome do usuário que sera cadstrado.
+email: e-mail de um usuário cadastrado.
+password: senha do usuário que possui o e-email.
 ### Respostas
 #### Ok(200)
 O usuário foi criado com sucesso no banco de dados.
 ### POST /auth
 Esse é o endpoint responsável pela autenticação do usuário, verificar usuário e senha usando o bcrypt e retornar um token jwt. 
 #### Parâmetros
-Nenhum.
+email: e-mail de um usuário cadastrado.
+password: senha do usuário que possui o e-email
 #### Respostas
 ##### Ok(200)
 Essa resposta ocorre quando tudo vai bem na autenticação e retorna um token. Exemplo de resposta:
@@ -74,7 +77,7 @@ Essa resposta acontece quando o usuário não está logado ou aconteceu alguma f
 ### GET /projects/:id
 Retorna as informações de um projeto baseado no id informado na URL.
 #### Parâmetros
-id: A chave primária de um projeto especifico do qual se deseja obter mais informações 
+id: A chave primária de um projeto especifico do qual se deseja obter mais informações passada na url
 #### Respostas
 ##### Ok(200)
 Retorna as informações sobre o projeto requisitado. Exemplo: 
@@ -88,5 +91,76 @@ Retorna as informações sobre o projeto requisitado. Exemplo:
     "userId": 1
 }
 ```
+#### Não encontrado (404)
+Retorna um json informando que o projeto não foi encontado. Exemplo:
+```
+{
+    "notFound": "projeto 50 não encontrado"
+}
+```
+### POST /project
+Endpoint responsável pela criação de um projeto no sistema.
+#### Parâmetros
+title: titulo do projeto
+description: descrição do projeto
+#### Respostas
+##### Criado(201)
+Retorna status de criado e as informações do usuário logado, que é creditado como criado do projeto. Exemplo de resposta:
+´´´
+{
+    "id": 1,
+    "email": "alex@gmail.com",
+    "name": "Alexandre"
+}
+´´´
+#### Não autorizado(401)
+Retorna o status 401 que indica não autorizado, normalmente devido ao usuário não ter realizado login. Exemplo de resposta:
+```
+{
+    "err": "Token inválido"
+}
+```
+### DELETE /project/:id
+Endpoint responsável por deletar um projeto de um usuário a partir do id.
+#### Parâmetros
+id: chave primária passada na url.
+#### Respostas
+##### Sem conteúdo(204)
+O projeto foi apagado, não há nada a retornar
+#### Não autorizado(401)
+O usuário não tem autorização para excluir esse projeto pois não foi criado por ele. A seguinte resposta é retornada: 
+```
+{
+    "err": "Usuário não autorizado"
+}
+```
+#### Projeto não encontrado(404)
+O projeto não foi encontrado dentro do banco de dados. A seguinte resposta será retornarda:
+```
+{
+    "notFound": "projeto 180 não encontrado"
+}
+```
 
+### PUT /project/:id
+Endpoint para edição de um projeto baseado no id do mesmo.
+#### Parâmetros
+id: chave primária passada na url.
+#### Respostas
+##### Redirecionamento(308)
+Se tudo ocorreu corretamente, redireciona o usuário para a página do projeto alterado (GET /project/:id).
+#### Não autorizado(401)
+O usuário não tem autorização para editar esse projeto pois não foi criado por ele. A seguinte resposta é retornada: 
+```
+{
+    "err": "Usuário não autorizado"
+}
+```
 
+### Projeto não encontrado(404)
+O projeto não foi encontrado dentro do banco de dados. A seguinte resposta será retornarda:
+```
+{
+    "notFound": "projeto 180 não encontrado"
+}
+```

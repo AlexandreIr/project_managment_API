@@ -17,7 +17,11 @@ router.get('/project/:id',authenticator, async(req, res)=>{
     const id = req.params.id;
     try {
         const project = await Project.findOne({where:{id:id}});
-        res.json(project);
+        if(project){
+            res.json(project);
+        } else {
+            res.status(404).json({notFound: `projeto ${id} não encontrado`});
+        }
     } catch (err) {
         res.json(err.parent.sqlMessage);
     }
@@ -32,7 +36,7 @@ router.post('/project',authenticator,async(req, res)=>{
             description,
             userId:user.id
         });
-        res.json(user);
+        res.status(201).json(user);
     } catch (err) {
         res.json(err);
     }
@@ -41,18 +45,22 @@ router.post('/project',authenticator,async(req, res)=>{
 router.delete('/project/:id',authenticator, async(req, res)=>{
     const id = req.params.id;
     const user = req.loggedUser;
-    const project = await Project.findOne({where:{id:id}});
-
+    
     try{
-        if(user.id==project.userId){
-            Project.destroy({
-                where:{
-                    id:id
-                }
-            });
-            res.redirect('/projects');
+        const project = await Project.findOne({where:{id:id}});
+        if(!project){
+            res.status(404).json({notFound: `projeto ${id} não encontrado`});
         } else {
-            res.status(401).json({err:"Usuário não autorizado"});
+            if(user.id==project.userId){
+                Project.destroy({
+                    where:{
+                        id:id
+                    }
+                });
+                res.sendStatus(204);
+            } else {
+                res.status(401).json({err:"Usuário não autorizado"});
+            }
         }
     } catch(err){
         res.json(err);
@@ -72,7 +80,7 @@ router.put('/project/:id',authenticator, async(req, res)=>{
             }, {
                 where:{id:id}
             });
-            res.redirect(`/project/${id}`);
+            res.status(308).redirect(`/project/${id}`);
         } else {
             res.status(401).json({err:"Usuário não autorizado"});
         }
