@@ -3,6 +3,9 @@ const router = express.Router();
 const Sequelize = require('sequelize');
 const Project = require('../models/Project');
 const authenticator = require('../middlewares/authMid');
+const cors = require('cors');
+
+router.use(cors());
 
 router.get('/projects',authenticator,async(req, res)=>{
     const user = req.loggedUser;
@@ -51,16 +54,13 @@ router.delete('/project/:id',authenticator, async(req, res)=>{
         if(!project){
             res.status(404).json({notFound: `projeto ${id} não encontrado`});
         } else {
-            if(user.id==project.userId){
-                Project.destroy({
-                    where:{
-                        id:id
-                    }
-                });
-                res.sendStatus(204);
-            } else {
-                res.status(401).json({err:"Usuário não autorizado"});
-            }
+            Project.destroy({
+                where:{
+                    id:id
+                }
+            });
+            res.sendStatus(204);
+           
         }
     } catch(err){
         res.json(err);
