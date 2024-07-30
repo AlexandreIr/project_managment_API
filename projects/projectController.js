@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Sequelize = require('sequelize');
 const Project = require('../models/Project');
+const Task = require('../models/Task');
 const authenticator = require('../middlewares/authMid');
 const cors = require('cors');
 
@@ -88,5 +89,17 @@ router.put('/project/:id',authenticator, async(req, res)=>{
         res.json(err);
     }
 });
+
+router.post('/task', authenticator, async (req, res)=>{
+    const {task} = req.body;
+    try{
+        await Task.create({
+            task
+        });
+        res.status(201);
+    } catch(err){
+        alert(`Erro inesperado: ${err}`)
+    }
+})
 
 module.exports = router;
